@@ -1,5 +1,6 @@
 import os
 import platform
+import signal
 from subprocess import check_output, PIPE, Popen
 from subprocess import TimeoutExpired
 
@@ -23,24 +24,18 @@ def in_path():
     else:
         raise OSError('Error while searching path.')
 
-in_path()
-
 
 def get_local_release(executable_path=None):
     cmd = os.path.join(executable_path, CMD)
-
     try:
         proc = Popen(cmd, env=os.environ, stdout=PIPE, stderr=PIPE,
-                     close_fds=platform.system() != 'Windows')
+                     close_fds=False)
     except OSError:
         msg = '{} executable needs to be in PATH.'
-        raise WebDriverException(
-            msg.format(executable_path))
-    else:
-        try:
-            outs, errs = proc.communicate(timeout=0.5)
-        except TimeoutExpired:
-            proc.kill()
-            stdout, stderr = proc.communicate()
+        raise WebDriverException(msg.format(executable_path))
+
+    with proc:
+        stdout, stderr = proc.communicate(timeout=1)
+
     version = parse_chromedriver_version(stdout.decode())
     return version
