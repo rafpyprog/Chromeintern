@@ -1,0 +1,8 @@
+beautifulsoup4>=4.5.3
+fire
+codecov
+lxml
+pytest
+requests
+selenium
+tqdm

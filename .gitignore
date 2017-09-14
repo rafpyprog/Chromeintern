@@ -1,0 +1,10 @@
+__pycache__/
+.cache/
+build/
+chromeintern.egg-info/
+dist/
+
+.coverage
+*.egg
+*.pyc
+*.swp
