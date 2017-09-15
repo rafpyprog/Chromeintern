@@ -15,6 +15,8 @@ from . import linux
 from . import mac
 from . import win
 
+from .utils import unzip
+
 
 class Chromintern():
     def __init__(self):
@@ -80,18 +82,19 @@ class Chromintern():
                 f.write(data)
         return os.path.join(path, installation_file)
 
+    def update(self):
+        if self.is_updated is True:
+            print('Chromedriver(v{}) already up-to-date.'
+            .format(self.local_release))
+        else:
+            print('Found existing installation: Chromedriver v{}'
+                  .format(self.local_release))
+            latest_release = get_latest_release()
+            download(path=get_chromedriver_path())
+            print('Successfully installed Chromedriver v{}'.format(self.local_release))
+
 
 '''########################################################################'''
-
-
-def unzip(file, path=None):
-    if path is None:
-        path = os.getcwd()
-    else:
-        path = os.fspath(path)
-    with zipfile.ZipFile(file) as z:
-        z.extractall(path)
-        return os.path.join(path, z.filelist[0].filename)
 
 
 def download(version=None, path=None, clean_up=True, set_environ=False):
@@ -129,6 +132,8 @@ def download(version=None, path=None, clean_up=True, set_environ=False):
 
 
 
+
+
 def get_chromedriver_path():
     path = None
     if platform.system() == 'Linux':
@@ -146,18 +151,6 @@ def get_chromedriver_path():
     return path
 
 
-def update():
-    installed_release = get_local_release()
-
-    if is_updated():
-        print('Chromedriver(v{}) already up-to-date.'
-        .format(installed_release))
-    else:
-        print('Found existing installation: Chromedriver v{}'
-              .format(installed_release))
-        latest_release = get_latest_release()
-        download(path=get_chromedriver_path())
-        print('Successfully installed Chromedriver v{}'.format(latest_release))
 
 
 #get_chrome(version='2.20', path=get_chromedriver_path())

@@ -8,10 +8,11 @@ from zipfile import ZipFile
 from chromintern import Chromintern
 from chromintern.linux import LINUX_FILENAME
 from chromintern.mac import MAC_FILENAME
-from chromintern.win import WIN_FILENAME, get_local_release, in_path
+from chromintern.win import WIN_FILENAME, get_local_release, in_path, win_get_path
 from chromintern.utils import powershell_get_latest_release, unzip
 
 
+TMP_FOLDER = os.path.expanduser('~')
 TESTS_FOLDER = os.path.join(os.getcwd(), 'tests')
 PLATFORM = platform.system()
 TEST_RELEASE = '2.20'
@@ -41,7 +42,19 @@ def test_win_get_local_release(tmp_folder):
 @pytest.mark.windows
 def test_win_in_path_true(tmp_folder):
     with tmp_folder:
-        assert in_path() is True
+        os.chdir(tmp_folder.name)
+        p = in_path()
+        os.chdir(os.getcwd())
+        assert p is True
+
+
+@pytest.mark.windows
+def test_win_get_path_ok(tmp_folder):
+    with tmp_folder:
+        os.chdir(tmp_folder.name)
+        assert win_get_path() is not None
+        os.chdir(os.getcwd())
+
 
 
 ###############################################################################

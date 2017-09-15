@@ -1,5 +1,6 @@
 import os
-from subprocess import PIPE, Popen
+from subprocess import check_output, PIPE, Popen
+import sys
 
 from selenium.common.exceptions import WebDriverException
 
@@ -42,3 +43,12 @@ def get_local_release(executable_path=None):
 
     version = parse_chromedriver_version(stdout.decode())
     return version
+
+
+def win_get_path():
+    ''' Returns path to Chromedriver or None '''
+    assert sys.platform == 'win32'
+    cmd = ['where', 'chromedriver']
+    stdout = check_output(cmd).decode().strip()
+    path = os.path.dirname(stdout)
+    return path
