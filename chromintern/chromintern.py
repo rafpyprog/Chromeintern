@@ -40,6 +40,10 @@ class Chromintern():
         return release
 
     @property
+    def is_updated(self, executable_path='chromedriver'):
+        return StrictVersion(self.local_release) == StrictVersion(self.latest_release)
+
+    @property
     def installation_file(self):
         ''' Chromedriver installation file for OS '''
         install_files = {'darwin': mac.MAC_FILENAME,
@@ -123,10 +127,6 @@ def download(version=None, path=None, clean_up=True, set_environ=False):
     return executable_path
 
 
-def is_updated(executable_path='chromedriver'):
-    local = get_local_release(executable_path)
-    latest = get_latest_release()
-    return StrictVersion(local) == StrictVersion(latest)
 
 
 def get_chromedriver_path():

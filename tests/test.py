@@ -9,7 +9,7 @@ from chromintern import Chromintern
 from chromintern.linux import LINUX_FILENAME
 from chromintern.mac import MAC_FILENAME
 from chromintern.win import WIN_FILENAME, get_local_release, in_path
-from chromintern.utils import powershell_get_latest_release
+from chromintern.utils import powershell_get_latest_release, unzip
 
 
 TESTS_FOLDER = os.path.join(os.getcwd(), 'tests')
@@ -73,6 +73,27 @@ def test_chromintern_installation_file():
         assert c.installation_file == LINUX_FILENAME
     else:
         raise 'Platform not supported - {}'.format(sys.platform)
+
+
+def test_chromintern_is_updated_false(tmp_folder):
+    ''' The test installation refers to release 2.20. Should return False '''
+    with tmp_folder:
+        c = Chromintern()
+        c.path = tmp_folder.name
+        assert c.is_updated is False
+
+
+def test_chromintern_is_updated_true(tmp_folder):
+    '''  Download the latest release, insert on path. Should return True '''
+    with tmp_folder:
+        path = tmp_folder.name
+        c = Chromintern()
+        c.path = path
+        # download the latest release to the tmp path folder and unzi
+        c.download(path=path)
+        unzip(os.path.join(path, c.installation_file), path)
+        assert c.local_release == c.latest_release
+        assert c.is_updated is True
 
 
 @pytest.mark.chromeintern
