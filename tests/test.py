@@ -25,6 +25,10 @@ def tmp_folder():
     # leave the temp folder
     tmp.cleanup()
 
+
+def test_easy():
+    assert 1 == 1
+
 @pytest.mark.windows
 def test_win_get_local_release(tmp_folder):
     with tmp_folder:

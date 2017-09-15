@@ -26,7 +26,11 @@ def in_path():
 
 
 def get_local_release(executable_path=None):
-    cmd = os.path.join(executable_path, CMD)
+    if executable_path:
+        cmd = os.path.join(executable_path, CMD)
+    else:
+        cmd = CMD
+        
     try:
         proc = Popen(cmd, env=os.environ, stdout=PIPE, stderr=PIPE,
                      close_fds=False)
@@ -36,6 +40,7 @@ def get_local_release(executable_path=None):
 
     with proc:
         stdout, stderr = proc.communicate(timeout=1)
+        proc.kill()
 
     version = parse_chromedriver_version(stdout.decode())
     return version
