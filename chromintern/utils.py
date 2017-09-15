@@ -1,6 +1,7 @@
 import re
 from subprocess import Popen, PIPE
 
+
 def parse_chromedriver_version(cmd_stdout):
     '''
         cmd_stdout (string): Output from chromedriver -v

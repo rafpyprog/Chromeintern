@@ -1,21 +1,18 @@
 import os
 from distutils.version import StrictVersion
 import platform
-import re
 import sys
-from subprocess import Popen, PIPE, check_output
+from subprocess import check_output
 import zipfile
 
 import fire
 import requests
-from bs4 import BeautifulSoup
-import lxml
-from selenium.common.exceptions import WebDriverException
 from tqdm import tqdm
 
 from . import __version__
 
 from . import linux
+from . import mac
 from . import win
 
 
@@ -42,68 +39,45 @@ class Chromintern():
         release = response.text.strip()
         return release
 
+    @property
+    def installation_file(self):
+        ''' Chromedriver installation file for OS '''
+        install_files = {'darwin': mac.MAC_FILENAME,
+                         'linux': linux.LINUX_FILENAME,
+                         'win32': win.WIN_FILENAME}
 
+        filename = install_files[sys.platform]
+        return filename
 
+    def download(self, version=None, path=None):
+        if version is None:
+            version = self.latest_release
 
+        if path is None:
+            path = os.getcwd()
+        else:
+            path = os.fspath(path)
 
+        installation_file = self.installation_file
+        version_file = '/'.join([str(version), installation_file])
 
+        DOWNLOAD_URL = self.GOOGLE_API + version_file
 
+        print('Downloading file: {}'.format(DOWNLOAD_URL))
+        response = requests.get(DOWNLOAD_URL, stream=True)
+        response.raise_for_status()
 
+        total_size = int(response.headers.get('content-length', 0))
+        path_to_save = os.path.join(path, installation_file)
+
+        with open(path_to_save, 'wb') as f:
+            for data in tqdm(iterable=response.iter_content(),
+                             total=total_size, unit='B', unit_scale=True):
+                f.write(data)
+        return os.path.join(path, installation_file)
 
 
 '''########################################################################'''
-
-
-GOOGLE_API = 'https://chromedriver.storage.googleapis.com/'
-PLATFORM = platform.system()
-
-
-def get_local_release(executable_path='chromedriver', platform=PLATFORM):
-    functions = {'Linux': linux.get_local_release,
-                 'Windows': win.get_local_release}
-
-    get_release = functions[PLATFORM]
-    release = get_release(executable_path)
-    return release
-
-
-def get_latest_release():
-    URL = GOOGLE_API + 'LATEST_RELEASE'
-    response = requests.get(URL)
-    response.raise_for_status()
-    release = response.text.strip()
-    return release
-
-
-def _download(version, path=None):
-    if path is None:
-        path = os.getcwd()
-    else:
-        path = os.fspath(path)
-
-    is_64bits = sys.maxsize > 2**32
-    n_bits = 64 if is_64bits else 32
-
-    # Determines which file to download according to the user platform
-    driver_files = {'darwin': 'chromedriver_mac64.zip',
-                    'linux': 'chromedriver_linux{}.zip'.format(n_bits),
-                    'win32': 'chromedriver_win32.zip'}
-    platform_file = driver_files[sys.platform]
-    version_file = '/'.join([str(version), platform_file])
-
-    DOWNLOAD_URL = GOOGLE_API + version_file
-
-    print('Downloading file: {}'.format(DOWNLOAD_URL))
-    response = requests.get(DOWNLOAD_URL, stream=True)
-    response.raise_for_status()
-
-    total_size = int(response.headers.get('content-length', 0))
-    path_to_save = os.path.join(path, platform_file)
-
-    with open(path_to_save, 'wb') as f:
-        for data in tqdm(iterable=response.iter_content(), total=total_size, unit='B', unit_scale=True):
-            f.write(data)
-    return os.path.join(path, platform_file)
 
 
 def unzip(file, path=None):

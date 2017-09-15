@@ -1,7 +1,9 @@
 import os
 import platform
-from subprocess import check_output, PIPE, Popen, TimeoutExpired
+from subprocess import PIPE, Popen
 import sys
+
+from selenium.common.exceptions import WebDriverException
 
 from . utils import parse_chromedriver_version
 

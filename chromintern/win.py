@@ -1,8 +1,5 @@
 import os
-import platform
-import signal
-from subprocess import check_output, PIPE, Popen
-from subprocess import TimeoutExpired
+from subprocess import PIPE, Popen
 
 from selenium.common.exceptions import WebDriverException
 
@@ -14,7 +11,8 @@ CMD = 'chromedriver.exe'
 
 
 def in_path():
-    proc = Popen('where ' + CMD, env=os.environ, stdout=PIPE, stderr=PIPE, close_fds=False)
+    proc = Popen('where ' + CMD, env=os.environ, stdout=PIPE, stderr=PIPE,
+                 close_fds=False)
     stdout, stderr = proc.communicate()
     status = proc.returncode
     if status == 0:
