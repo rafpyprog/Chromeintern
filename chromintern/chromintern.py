@@ -25,6 +25,7 @@ class Chromintern():
         self.platform = platform.system()
         self.path = 'chromedriver'
 
+    @property
     def local_release(self):
         functions = {'Linux': linux.get_local_release,
                      'Windows': win.get_local_release}
@@ -32,6 +33,15 @@ class Chromintern():
         get_release = functions[self.platform]
         release = get_release(executable_path=self.path)
         return release
+
+    @property
+    def latest_release(self):
+        URL = self.GOOGLE_API + 'LATEST_RELEASE'
+        response = requests.get(URL)
+        response.raise_for_status()
+        release = response.text.strip()
+        return release
+
 
 
 

@@ -10,15 +10,15 @@ from . utils import parse_chromedriver_version
 
 
 WIN_FILENAME = 'chromedriver_win32.zip'
-CMD = 'chromedriver'
+CMD = 'chromedriver.exe'
 
 
 def in_path():
-    proc = Popen(['where', CMD], stdout=PIPE, stderr=PIPE)
+    proc = Popen('where ' + CMD, env=os.environ, stdout=PIPE, stderr=PIPE, close_fds=False)
     stdout, stderr = proc.communicate()
     status = proc.returncode
     if status == 0:
-        return stdout.decode().splitlines()
+        return True
     elif status == 1:
         return False
     else:
@@ -30,7 +30,7 @@ def get_local_release(executable_path=None):
         cmd = os.path.join(executable_path, CMD)
     else:
         cmd = CMD
-        
+
     try:
         proc = Popen(cmd, env=os.environ, stdout=PIPE, stderr=PIPE,
                      close_fds=False)

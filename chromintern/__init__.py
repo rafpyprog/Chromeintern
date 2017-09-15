@@ -7,3 +7,4 @@ from .chromintern import Chromintern
 from . import linux
 from . import win
 from . import mac
+from . import utils
