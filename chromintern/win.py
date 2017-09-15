@@ -38,7 +38,7 @@ def get_local_release(executable_path=None):
         raise WebDriverException(msg.format(executable_path))
 
     with proc:
-        stdout, stderr = proc.communicate(timeout=1)
+        stdout, stderr = proc.communicate(timeout=5)
         proc.kill()
 
     version = parse_chromedriver_version(stdout.decode())

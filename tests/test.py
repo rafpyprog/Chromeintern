@@ -12,19 +12,24 @@ from chromintern.win import WIN_FILENAME, get_local_release, in_path, win_get_pa
 from chromintern.utils import powershell_get_latest_release, unzip
 
 
-TMP_FOLDER = os.path.expanduser('~')
 TESTS_FOLDER = os.path.join(os.getcwd(), 'tests')
 PLATFORM = platform.system()
 TEST_RELEASE = '2.20'
-
+TMP_PATH_FOLDER = os.path.normpath(os.path.expanduser('~'))
 
 @pytest.fixture
 def tmp_folder():
-    tmp = TemporaryDirectory()
-    with ZipFile(os.path.join(TESTS_FOLDER, WIN_FILENAME)) as z:
-        z.extractall(tmp.name)
-    yield tmp
-    tmp.cleanup()
+    if sys.platform == 'win32':
+        installation_file = os.path.join(TESTS_FOLDER, WIN_FILENAME)
+        executable = os.path.join(TMP_PATH_FOLDER, 'chromedriver.exe')
+
+    with ZipFile(installation_file) as z:
+        z.extractall(TMP_PATH_FOLDER)
+
+    yield TMP_PATH_FOLDER
+
+    os.remove(executable)
+
 
 
 ###############################################################################
@@ -33,27 +38,20 @@ def tmp_folder():
 
 @pytest.mark.windows
 def test_win_get_local_release(tmp_folder):
-    with tmp_folder:
-        chrome_path = tmp_folder.name
-        release = get_local_release(chrome_path)
+    chrome_path = tmp_folder
+    release = get_local_release(chrome_path)
     assert release == TEST_RELEASE
 
 
 @pytest.mark.windows
 def test_win_in_path_true(tmp_folder):
-    with tmp_folder:
-        os.chdir(tmp_folder.name)
-        p = in_path()
-        os.chdir(os.getcwd())
-        assert p is True
+    assert in_path() is True
 
 
 @pytest.mark.windows
 def test_win_get_path_ok(tmp_folder):
-    with tmp_folder:
-        os.chdir(tmp_folder.name)
-        assert win_get_path() is not None
-        os.chdir(os.getcwd())
+    assert win_get_path() == TMP_PATH_FOLDER
+
 
 
 
@@ -63,10 +61,9 @@ def test_win_get_path_ok(tmp_folder):
 
 @pytest.mark.chromeintern
 def test_chromintern_get_local_release(tmp_folder):
-    with tmp_folder:
-        c = Chromintern()
-        c.path = tmp_folder.name
-        assert c.local_release == TEST_RELEASE
+    c = Chromintern()
+    c.path = tmp_folder
+    assert c.local_release == TEST_RELEASE
 
 
 @pytest.mark.chromeintern
@@ -90,29 +87,26 @@ def test_chromintern_installation_file():
 
 def test_chromintern_is_updated_false(tmp_folder):
     ''' The test installation refers to release 2.20. Should return False '''
-    with tmp_folder:
-        c = Chromintern()
-        c.path = tmp_folder.name
-        assert c.is_updated is False
+    c = Chromintern()
+    c.path = tmp_folder
+    assert c.is_updated is False
 
 
+@pytest.mark.chromeintern
 def test_chromintern_is_updated_true(tmp_folder):
     '''  Download the latest release, insert on path. Should return True '''
-    with tmp_folder:
-        path = tmp_folder.name
-        c = Chromintern()
-        c.path = path
-        # download the latest release to the tmp path folder and unzi
-        c.download(path=path)
-        unzip(os.path.join(path, c.installation_file), path)
-        assert c.local_release == c.latest_release
-        assert c.is_updated is True
+    path = tmp_folder
+    c = Chromintern()
+    c.path = path
+    # download the latest release to the tmp path folder and unzi
+    c.download(path=path)
+    unzip(os.path.join(path, c.installation_file), path)
+    assert c.local_release == c.latest_release
+    assert c.is_updated is True
 
 
 @pytest.mark.chromeintern
 def test_chromintern_download_latest_release(tmp_folder):
-    with tmp_folder:
-        c = Chromintern()
-        c.download(path=tmp_folder.name)
-        assert os.path.isfile(os.path.join(tmp_folder.name,
-                                           c.installation_file))
+    c = Chromintern()
+    c.download(path=tmp_folder)
+    assert os.path.isfile(os.path.join(tmp_folder, c.installation_file))
