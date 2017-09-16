@@ -84,7 +84,7 @@ def test_chromintern_installation_file():
     else:
         raise 'Platform not supported - {}'.format(sys.platform)
 
-
+@pytest.mark.chromeintern
 def test_chromintern_is_updated_false(tmp_folder):
     ''' The test installation refers to release 2.20. Should return False '''
     c = Chromintern()
@@ -101,7 +101,6 @@ def test_chromintern_is_updated_true(tmp_folder):
     # download the latest release to the tmp path folder and unzi
     c.download(path=path)
     unzip(os.path.join(path, c.installation_file), path)
-    assert c.local_release == c.latest_release
     assert c.is_updated is True
 
 
@@ -110,3 +109,15 @@ def test_chromintern_download_latest_release(tmp_folder):
     c = Chromintern()
     c.download(path=tmp_folder)
     assert os.path.isfile(os.path.join(tmp_folder, c.installation_file))
+
+
+@pytest.mark.chromeintern
+def test_chrmintern_update_already_updated(tmp_folder):
+    path = tmp_folder
+    c = Chromintern()
+    c.path = path
+    # download the latest release to the tmp path folder and unzi
+    c.download(path=path)
+    unzip(os.path.join(path, c.installation_file), path)
+    # already updated retunr None
+    assert c.update() is None

@@ -86,6 +86,7 @@ class Chromintern():
         if self.is_updated is True:
             print('Chromedriver(v{}) already up-to-date.'
             .format(self.local_release))
+            return None
         else:
             print('Found existing installation: Chromedriver v{}'
                   .format(self.local_release))

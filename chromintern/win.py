@@ -67,6 +67,12 @@ def win_get_path():
     ''' Returns path to Chromedriver or None '''
     assert sys.platform == 'win32'
     cmd = ['where', 'chromedriver']
-    stdout = check_output(cmd).decode().strip()
-    path = os.path.dirname(stdout)
+    p = Popen(cmd, stdout=PIPE, stdin=PIPE)
+    try:
+        stdout, errs = p.communicate(timeout=2)
+    except TimeoutExpired:
+        p.kill()
+        stdout, errs = p.communicate()
+            
+    path = os.path.dirname(stdout.decode().strip())
     return path
