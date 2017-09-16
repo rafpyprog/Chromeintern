@@ -1,6 +1,11 @@
 import os
 from subprocess import check_output, PIPE, Popen
 import sys
+from threading  import Thread
+try:
+    from Queue import Queue, Empty
+except ImportError:
+    from queue import Queue, Empty  # python 3.x
 
 from selenium.common.exceptions import WebDriverException
 
@@ -30,18 +35,31 @@ def get_local_release(executable_path=None):
     else:
         cmd = CMD
 
-    try:
-        proc = Popen(cmd, env=os.environ, stdout=PIPE, stderr=PIPE,
-                     close_fds=False)
-    except OSError:
-        msg = '{} executable needs to be in PATH.'
-        raise WebDriverException(msg.format(executable_path))
+    def enqueue_output(out, queue):
+        for line in iter(out.readline, b''):
+            queue.put(line)
+        out.close()
 
-    with proc:
-        stdout, stderr = proc.communicate(timeout=5)
-        proc.kill()
+    ON_POSIX = 'posix' in sys.builtin_module_names
+    p = Popen([cmd], stdout=PIPE, bufsize=1, close_fds=ON_POSIX)
+    q = Queue()
+    t = Thread(target=enqueue_output, args=(p.stdout, q))
+    t.daemon = True # thread dies with the program
+    t.start()
 
-    version = parse_chromedriver_version(stdout.decode())
+    stdout = None
+    while not stdout:
+        try:
+            stdout = q.get_nowait() # or q.get(timeout=.1)
+        except Empty:
+            pass # no output yet
+        else:
+            p.kill()
+
+    while not p.poll():
+        pass #wait process finish
+
+    version = parse_chromedriver_version(stdout.decode().strip())
     return version
 
 
