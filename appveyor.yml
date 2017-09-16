@@ -1,3 +1,5 @@
+# NEED TO PUT USER HOME FOLDER IN PATH
+
 install:
     # Install Powershell
   - ps: (new-object net.webclient).DownloadFile('https://mysite.com/mypackage.msi', 'mypackage.msi')
