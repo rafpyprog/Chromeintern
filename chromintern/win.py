@@ -40,12 +40,18 @@ def get_local_release(executable_path=None):
             queue.put(line)
         out.close()
 
+<<<<<<< HEAD
     ON_POSIX = 'posix' in sys.builtin_module_names
     p = Popen([cmd], stdout=PIPE, bufsize=1, close_fds=ON_POSIX)
     q = Queue()
     t = Thread(target=enqueue_output, args=(p.stdout, q))
     t.daemon = True # thread dies with the program
     t.start()
+=======
+    with proc:
+        stdout, stderr = proc.communicate(timeout=5)
+        proc.kill()
+>>>>>>> fac2eba703c0a9cabeedc56d5b867c9652398a41
 
     stdout = None
     while not stdout:
