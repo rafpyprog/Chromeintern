@@ -90,9 +90,14 @@ class Chromintern():
         else:
             print('Found existing installation: Chromedriver v{}'
                   .format(self.local_release))
-            latest_release = get_latest_release()
-            download(path=get_chromedriver_path())
+
+            if self.platform == 'win32':
+                path = win.get_chromedriver_path()
+            else:
+                path = None
+            self.download(path=path)
             print('Successfully installed Chromedriver v{}'.format(self.local_release))
+            return True
 
 
 '''########################################################################'''

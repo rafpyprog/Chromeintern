@@ -112,7 +112,7 @@ def test_chromintern_download_latest_release(tmp_folder):
 
 
 @pytest.mark.chromeintern
-def test_chrmintern_update_already_updated(tmp_folder):
+def test_chromintern_update_already_updated(tmp_folder):
     path = tmp_folder
     c = Chromintern()
     c.path = path
@@ -121,3 +121,9 @@ def test_chrmintern_update_already_updated(tmp_folder):
     unzip(os.path.join(path, c.installation_file), path)
     # already updated retunr None
     assert c.update() is None
+
+@pytest.mark.chromeintern
+def test_chromintern_update(tmp_folder):
+    c = Chromintern()
+    c.path = tmp_folder
+    assert c.update() is True
