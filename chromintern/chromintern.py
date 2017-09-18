@@ -99,6 +99,8 @@ class Chromintern():
             print('Successfully installed Chromedriver v{}'.format(self.local_release))
             return True
 
+    def raise_for_outdated(self):
+
 
 '''########################################################################'''
 

@@ -126,4 +126,5 @@ def test_chromintern_update_already_updated(tmp_folder):
 def test_chromintern_update(tmp_folder):
     c = Chromintern()
     c.path = tmp_folder
-    assert c.update() is True
+    c.update()
+    assert c.is_updated is True
