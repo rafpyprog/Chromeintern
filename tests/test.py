@@ -23,12 +23,17 @@ def tmp_folder():
         installation_file = os.path.join(TESTS_FOLDER, WIN_FILENAME)
         executable = os.path.join(TMP_PATH_FOLDER, 'chromedriver.exe')
 
+
     with ZipFile(installation_file) as z:
         z.extractall(TMP_PATH_FOLDER)
 
     yield TMP_PATH_FOLDER
 
+    while not os.access(executable, os.W_OK):
+        pass
     os.remove(executable)
+    while os.path.isfile(executable):
+        pass
 
 
 
@@ -73,7 +78,7 @@ def test_chromintern_latest_release():
 
 
 @pytest.mark.chromeintern
-def test_chromintern_installation_file():
+def test_chromintern_installation_filename():
     c = Chromintern()
     if sys.platform == 'win32':
         assert c.installation_file == WIN_FILENAME

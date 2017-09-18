@@ -1,6 +1,7 @@
 import os
 from subprocess import check_output, PIPE, Popen
 import sys
+import time
 from threading  import Thread
 try:
     from Queue import Queue, Empty
@@ -21,6 +22,7 @@ def in_path():
                  close_fds=False)
     stdout, stderr = proc.communicate()
     status = proc.returncode
+    print(proc)
     if status == 0:
         return True
     elif status == 1:
@@ -57,7 +59,7 @@ def get_local_release(executable_path=None):
             p.kill()
 
     while not p.poll():
-        pass #wait process finish
+        pass
 
     version = parse_chromedriver_version(stdout.decode().strip())
     return version
@@ -73,6 +75,6 @@ def win_get_path():
     except TimeoutExpired:
         p.kill()
         stdout, errs = p.communicate()
-            
+
     path = os.path.dirname(stdout.decode().strip())
     return path

@@ -100,6 +100,7 @@ class Chromintern():
             return True
 
     def raise_for_outdated(self):
+        pass
 
 
 '''########################################################################'''
