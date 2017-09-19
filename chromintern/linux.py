@@ -7,8 +7,7 @@ from selenium.common.exceptions import WebDriverException
 
 from . utils import parse_chromedriver_version
 
-
-n_bits = 64 if sys.maxsize > 2**32 else 32
+n_bits, linkage = platform.architecture()
 LINUX_FILENAME = 'chromedriver_linux{}.zip'.format(n_bits)
 
 

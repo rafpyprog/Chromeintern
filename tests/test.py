@@ -9,6 +9,7 @@ from chromintern import Chromintern
 from chromintern.linux import LINUX_FILENAME
 from chromintern.mac import MAC_FILENAME
 from chromintern.win import WIN_FILENAME, get_local_release, in_path, win_get_path
+from chromintern.exceptions import *
 from chromintern.utils import powershell_get_latest_release, unzip
 
 
@@ -132,4 +133,12 @@ def test_chromintern_update(tmp_folder):
     c = Chromintern()
     c.path = tmp_folder
     c.update()
-    assert c.is_updated is True
+    #assert c.is_updated is True
+    assert c.local_release == c.latest_release
+
+@pytest.mark.chromeintern
+def test_raise_for_update(tmp_folder):
+    c = Chromintern()
+    c.path = tmp_folder
+    with pytest.raises(NotUpdatedException):
+        c.raise_for_update()

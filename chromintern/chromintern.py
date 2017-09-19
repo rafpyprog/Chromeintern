@@ -15,7 +15,9 @@ from . import linux
 from . import mac
 from . import win
 
+from . exceptions import *
 from .utils import unzip
+
 
 
 class Chromintern():
@@ -91,78 +93,21 @@ class Chromintern():
             print('Found existing installation: Chromedriver v{}'
                   .format(self.local_release))
 
-            if self.platform == 'win32':
-                path = win.get_chromedriver_path()
+            if self.platform == 'Windows':
+                path = win.win_get_path()
             else:
                 path = None
-            self.download(path=path)
+
+            installation_file = self.download(path=path)
+            executable = unzip(installation_file, path=path)
+
             print('Successfully installed Chromedriver v{}'.format(self.local_release))
             return True
 
-    def raise_for_outdated(self):
-        pass
-
-
-'''########################################################################'''
-
-
-def download(version=None, path=None, clean_up=True, set_environ=False):
-    '''
-        Download a Chromedriver release. If version is None, will download
-        the lastest release.
-    '''
-    if path is None:
-        path = os.getcwd()
-    else:
-        path = os.fspath(path)
-
-    if version is None:
-        version = get_latest_release()
-
-    chrome_zip = _download(version, path=path)
-    executable_path = unzip(chrome_zip, path=path)
-
-    if sys.platform == 'linux':
-        os.system('chmod +x ' + executable_path)
-
-    # On windows we always keep the original zip file. It's use to determines
-    # the version of the installed chromedriver
-    if clean_up is True and platform.system() != 'Windows':
-        os.remove(chrome_zip)
-
-    if set_environ is True:
-        environ_variable = 'CHROME_DRIVER_PATH'
-        os.environ[environ_variable] = executable_path
-        print('Chrome path {} on environ variable {}.'
-              .format(executable_path, environ_variable))
-
-    return executable_path
-
-
-
-
-
-
-def get_chromedriver_path():
-    path = None
-    if platform.system() == 'Linux':
-        cmd = ['which', 'chromedriver']
-        path = check_output(cmd).decode().strip()
-        path = os.path.dirname(path)
-    elif platform.system() == 'Windows':
-        path = win_path()
-    else:
-        #TO DO Windows, MAC
-        pass
-
-    if not path:
-        raise FileNotFoundError('Could not find Chromedriver executable path.')
-    return path
-
-
-
-
-#get_chrome(version='2.20', path=get_chromedriver_path())
-if __name__ == '__main__':
-    print('\nChromintern {}'.format(__version__.__version__))
-    fire.Fire({'update': update, 'download': download})
+    def raise_for_update(self):
+        ''' Raises NotUpdatedException if installed Chromedriver is not
+            updated
+        '''
+        
+        if self.is_updated is False:
+            raise NotUpdatedException(self.local_release, self.latest_release)
