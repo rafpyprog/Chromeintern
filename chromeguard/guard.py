@@ -19,12 +19,11 @@ from . exceptions import *
 from .utils import unzip
 
 
-
-class Chromintern():
-    def __init__(self):
+class Guard():
+    def __init__(self, path=None):
         self.GOOGLE_API = 'https://chromedriver.storage.googleapis.com/'
         self.platform = platform.system()
-        self.path = 'chromedriver'
+        self.path = path or 'chromedriver'
 
     @property
     def local_release(self):
@@ -62,7 +61,7 @@ class Chromintern():
             version = self.latest_release
 
         if path is None:
-            path = os.getcwd()
+            path = self.path
         else:
             path = os.fspath(path)
 
@@ -108,6 +107,6 @@ class Chromintern():
         ''' Raises NotUpdatedException if installed Chromedriver is not
             updated
         '''
-        
+
         if self.is_updated is False:
             raise NotUpdatedException(self.local_release, self.latest_release)

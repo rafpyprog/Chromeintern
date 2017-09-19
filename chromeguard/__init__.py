@@ -2,7 +2,7 @@
 
 from .__version__ import __version__
 
-from .chromintern import Chromintern
+from .guard import *
 
 
 from . import linux

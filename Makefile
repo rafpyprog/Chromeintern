@@ -2,10 +2,10 @@ init:
 	pip install -r requirements.txt -U
 
 test:
-	python -m pytest -v tests/test.py
+	pytest tests/test.py --verbose --cov-report term --cov-report xml --cov chromeguard
 
 test-win:
-		python -m pytest -v tests/test.py -m windows
+	python -m pytest -v tests/test.py -m windows
 
 push:
 	git add .
