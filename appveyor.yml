@@ -1,7 +1,0 @@
-# NEED TO PUT USER HOME FOLDER IN PATH
-# NEED TO INSTALL POWER SHELL 3.0
-
-install:
-    # Install Powershell
-  - ps: (new-object net.webclient).DownloadFile('https://mysite.com/mypackage.msi', 'mypackage.msi')
-  - ps: msiexec /i mypackage.msi /quiet /qn /norestart /log install.log PROPERTY1=value1 PROPERTY2=value2
