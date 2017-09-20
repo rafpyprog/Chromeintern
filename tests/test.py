@@ -2,7 +2,6 @@ import os
 import platform
 import pytest
 import sys
-from tempfile import TemporaryDirectory
 from zipfile import ZipFile
 
 from chromeguard import Guard
@@ -13,6 +12,7 @@ from chromeguard.exceptions import *
 from chromeguard.utils import API_get_latest_release, unzip
 
 
+APPVEYOR_PATH = 'C:\\Tools\\WebDriver'
 TESTS_FOLDER = os.path.join(os.getcwd(), 'tests')
 PLATFORM = platform.system()
 TEST_RELEASE = '2.20'
@@ -57,7 +57,11 @@ def test_win_get_local_release(tmp_folder):
 
 @pytest.mark.windows
 def test_win_get_path_ok(tmp_folder):
-    assert win_get_path() == tmp_folder
+    # Delete AppVeyor WebDriver Tools
+    #if os.path.isdir(tools):
+    #    os.path.remove(os.path.join(tools, 'chromedriver.exe'))
+
+    assert win_get_path() in (tmp_folder, APPVEYOR_PATH)
 
 
 ###############################################################################
