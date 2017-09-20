@@ -10,17 +10,30 @@ from chromeguard.linux import LINUX_FILENAME
 from chromeguard.mac import MAC_FILENAME
 from chromeguard.win import WIN_FILENAME, get_local_release, win_get_path
 from chromeguard.exceptions import *
-from chromeguard.utils import powershell_get_latest_release, unzip
+from chromeguard.utils import API_get_latest_release, unzip
 
 
 TESTS_FOLDER = os.path.join(os.getcwd(), 'tests')
 PLATFORM = platform.system()
 TEST_RELEASE = '2.20'
-TMP_PATH_FOLDER = os.path.normpath(os.path.expanduser('~'))
+
+
+def clean_up(executable):
+    while True:
+        try:
+            a = os.remove(executable)
+            while os.path.isfile(executable) is True:
+                pass
+        except PermissionError:
+            pass
+        else:
+            break
 
 
 @pytest.fixture
 def tmp_folder():
+    TMP_PATH_FOLDER = os.path.normpath(os.path.expanduser('~'))
+
     if sys.platform == 'win32':
         installation_file = os.path.join(TESTS_FOLDER, WIN_FILENAME)
         executable = os.path.join(TMP_PATH_FOLDER, 'chromedriver.exe')
@@ -30,8 +43,7 @@ def tmp_folder():
         z.close()
 
     yield TMP_PATH_FOLDER
-    os.remove(executable)
-
+    clean_up(executable)
 
 ###############################################################################
 # WINDOWS ESPECIFIC FUNCTIONS
@@ -39,14 +51,13 @@ def tmp_folder():
 
 @pytest.mark.windows
 def test_win_get_local_release(tmp_folder):
-    chrome_path = tmp_folder
-    release = get_local_release(chrome_path)
+    release = get_local_release(tmp_folder)
     assert release == TEST_RELEASE
 
 
 @pytest.mark.windows
 def test_win_get_path_ok(tmp_folder):
-    assert win_get_path() == TMP_PATH_FOLDER
+    assert win_get_path() == tmp_folder
 
 
 ###############################################################################
@@ -62,7 +73,7 @@ def test_guard_get_local_release(tmp_folder):
 @pytest.mark.Guard
 def test_guard_latest_release():
     g = Guard()
-    assert g.latest_release == powershell_get_latest_release()
+    assert g.latest_release == API_get_latest_release()
 
 
 @pytest.mark.Guard

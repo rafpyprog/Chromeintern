@@ -3,6 +3,9 @@ import re
 from subprocess import Popen, PIPE
 import zipfile
 
+import requests
+
+
 def parse_chromedriver_version(cmd_stdout):
     '''
         cmd_stdout (string): Output from chromedriver -v
@@ -16,17 +19,11 @@ def parse_chromedriver_version(cmd_stdout):
                         .format(cmd_stdout))
 
 
-def powershell_rest_request(URL):
-    cmd = 'powershell -Command Invoke-RestMethod -Uri {}'.format(URL)
-    proc = Popen(cmd, stdout=PIPE)
-    stdout, stderr = proc.communicate()
-    content = stdout.decode()
-    return content
-
-
-def powershell_get_latest_release():
+def API_get_latest_release():
     API_URL = 'https://chromedriver.storage.googleapis.com/LATEST_RELEASE'
-    release = powershell_rest_request(API_URL).strip().replace(',', '.')
+    response = requests.get(API_URL)
+    response.raise_for_status()
+    release = response.text.strip().replace(',', '.')
     return release
 
 
