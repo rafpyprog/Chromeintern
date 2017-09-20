@@ -8,14 +8,8 @@ environment:
     # isn't covered by this document) at the time of writing.
 
     - PYTHON: "C:\\Python27"
-    - PYTHON: "C:\\Python33"
-    - PYTHON: "C:\\Python34"
     - PYTHON: "C:\\Python35"
-    - PYTHON: "C:\\Python27-x64"
-    - PYTHON: "C:\\Python33-x64"
-      DISTUTILS_USE_SDK: "1"
-    - PYTHON: "C:\\Python34-x64"
-      DISTUTILS_USE_SDK: "1"
+    - PYTHON: "C:\\Python27-x64"    
     - PYTHON: "C:\\Python35-x64"
 
 install:
@@ -33,7 +27,7 @@ test_script:
   # Note that you must use the environment variable %PYTHON- "build.cmd %PYTHON%\\python.exe setup.py test"% to refer to
   # the interpreter you're using - Appveyor does not do anything special
   # to put the Python version you want to use on PATH.
-  - "build.cmd %PYTHON%\\python.exe setup.py test"
+  #- "build.cmd %PYTHON%\\python.exe setup.py test"
   - "%PYTHON%\\python.exe -m pytest tests/test.py -v"
 
 after_test:
