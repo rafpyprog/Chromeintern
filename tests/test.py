@@ -8,7 +8,7 @@ from chromeguard import Guard
 from chromeguard.linux import LINUX_FILENAME
 from chromeguard.mac import MAC_FILENAME
 from chromeguard.win import WIN_FILENAME, get_local_release, win_get_path
-from chromeguard.exceptions import *
+from chromeguard.exceptions import NotUpdatedException
 from chromeguard.utils import API_get_latest_release, unzip
 
 
@@ -21,7 +21,7 @@ TEST_RELEASE = '2.20'
 def clean_up(executable):
     while True:
         try:
-            a = os.remove(executable)
+            os.remove(executable)
             while os.path.isfile(executable) is True:
                 pass
         except PermissionError:
@@ -49,6 +49,7 @@ def tmp_folder():
 # WINDOWS ESPECIFIC FUNCTIONS
 ###############################################################################
 
+
 @pytest.mark.windows
 def test_win_get_local_release(tmp_folder):
     release = get_local_release(tmp_folder)
@@ -57,10 +58,6 @@ def test_win_get_local_release(tmp_folder):
 
 @pytest.mark.windows
 def test_win_get_path_ok(tmp_folder):
-    # Delete AppVeyor WebDriver Tools
-    #if os.path.isdir(tools):
-    #    os.path.remove(os.path.join(tools, 'chromedriver.exe'))
-
     assert win_get_path() in (tmp_folder, APPVEYOR_PATH)
 
 

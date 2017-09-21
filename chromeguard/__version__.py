@@ -3,7 +3,7 @@
 __title__ = 'chromintern'
 __description__ = 'Install and keep your Chromedriver update.'
 __url__ = 'https://github.com/rafpyprog/Chromintern'
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 __author__ = 'Rafael Alves Ribeiro'
 __author_email__ = 'rafael.alves.ribeiro@gmail.com'
 __license__ = 'MIT'

@@ -2,20 +2,14 @@ import os
 from distutils.version import StrictVersion
 import platform
 import sys
-from subprocess import check_output
-import zipfile
 
-import fire
 import requests
 from tqdm import tqdm
-
-from . import __version__
 
 from . import linux
 from . import mac
 from . import win
-
-from . exceptions import *
+from . exceptions import NotUpdatedException
 from .utils import unzip
 
 
@@ -44,7 +38,9 @@ class Guard():
 
     @property
     def is_updated(self, executable_path='chromedriver'):
-        return StrictVersion(self.local_release) == StrictVersion(self.latest_release)
+        local = StrictVersion(self.local_release)
+        latest = StrictVersion(self.latest_release)
+        return local == latest
 
     @property
     def installation_file(self):
@@ -62,7 +58,7 @@ class Guard():
 
         if path is None:
             path = self.path
-        
+
         installation_file = self.installation_file
         version_file = '/'.join([str(version), installation_file])
 
@@ -84,21 +80,17 @@ class Guard():
     def update(self):
         if self.is_updated is True:
             print('Chromedriver(v{}) already up-to-date.'
-            .format(self.local_release))
+                  .format(self.local_release))
             return None
         else:
             print('Found existing installation: Chromedriver v{}'
                   .format(self.local_release))
 
-            if self.platform == 'Windows':
-                path = win.win_get_path()
-            else:
-                path = None
+            installation_file = self.download(path=self.path)
+            unzip(installation_file, path=self.path)
 
-            installation_file = self.download(path=path)
-            executable = unzip(installation_file, path=path)
-
-            print('Successfully installed Chromedriver v{}'.format(self.local_release))
+            print('Successfully installed Chromedriver v{}'
+                  .format(self.local_release))
             return True
 
     def raise_for_update(self):

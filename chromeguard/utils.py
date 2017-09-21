@@ -1,10 +1,8 @@
 import os
 import re
-from subprocess import Popen, PIPE
 import zipfile
 
 import requests
-
 
 
 def parse_chromedriver_version(cmd_stdout):
@@ -31,8 +29,7 @@ def API_get_latest_release():
 def unzip(file, path=None):
     if path is None:
         path = os.getcwd()
-    #else:
-        #path = path
+
     with zipfile.ZipFile(file) as z:
         z.extractall(path)
         return os.path.join(path, z.filelist[0].filename)

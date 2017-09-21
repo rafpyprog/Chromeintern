@@ -1,7 +1,6 @@
 import os
 import platform
 from subprocess import PIPE, Popen
-import sys
 
 from selenium.common.exceptions import WebDriverException
 
