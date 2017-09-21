@@ -62,9 +62,7 @@ class Guard():
 
         if path is None:
             path = self.path
-        else:
-            path = os.fspath(path)
-
+        
         installation_file = self.installation_file
         version_file = '/'.join([str(version), installation_file])
 
