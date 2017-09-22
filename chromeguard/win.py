@@ -1,3 +1,7 @@
+'''
+    Windows specific routines
+'''
+
 import os
 from subprocess import PIPE, Popen
 
@@ -9,6 +13,7 @@ CMD = 'chromedriver.exe'
 
 
 def get_local_release(executable_path=""):
+    ''' Returns the version of the installed Chromedriver '''
     cmd = os.path.join(executable_path, CMD)
 
     with Popen([cmd, '-v'], close_fds=False, stdout=PIPE,
@@ -22,14 +27,8 @@ def get_local_release(executable_path=""):
 def win_get_path():
     ''' Returns path to Chromedriver or None '''
     cmd = ['where', 'chromedriver']
-    with Popen(cmd, stdout=PIPE, universal_newlines=True) as p:
-        stdout = p.stdout.read()
-    '''
-    try:
-        stdout, errs = p.communicate(timeout=2)
-    except TimeoutExpired:
-        p.kill()
-        stdout, errs = p.communicate()'''
+    with Popen(cmd, stdout=PIPE, universal_newlines=True) as process:
+        stdout = process.stdout.read()
 
     path = os.path.dirname(stdout.strip())
     return path

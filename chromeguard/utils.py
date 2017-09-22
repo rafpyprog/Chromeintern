@@ -1,3 +1,7 @@
+'''
+    Useful routines used by any OS
+'''
+
 import os
 import re
 import zipfile
@@ -30,6 +34,6 @@ def unzip(file, path=None):
     if path is None:
         path = os.getcwd()
 
-    with zipfile.ZipFile(file) as z:
-        z.extractall(path)
-        return os.path.join(path, z.filelist[0].filename)
+    with zipfile.ZipFile(file) as installer:
+        installer.extractall(path)
+        return os.path.join(path, installer.filelist[0].filename)
