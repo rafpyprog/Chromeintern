@@ -97,6 +97,5 @@ class Guard():
         ''' Raises NotUpdatedException if installed Chromedriver is not
             updated
         '''
-
         if self.is_updated is False:
             raise NotUpdatedException(self.local_release, self.latest_release)
