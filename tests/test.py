@@ -1,11 +1,12 @@
 import os
 import platform
 import pytest
+import stat
 import sys
 from zipfile import ZipFile
 
 from chromeguard import Guard
-from chromeguard.linux import LINUX_FILENAME
+from chromeguard import linux
 from chromeguard.mac import MAC_FILENAME
 from chromeguard.win import WIN_FILENAME, get_local_release, win_get_path
 from chromeguard.exceptions import NotUpdatedException
@@ -15,7 +16,7 @@ from chromeguard.utils import API_get_latest_release, unzip
 APPVEYOR_PATH = 'C:\\Tools\\WebDriver'
 TESTS_FOLDER = os.path.join(os.getcwd(), 'tests')
 PLATFORM = platform.system()
-TEST_RELEASE = '2.20'
+TEST_RELEASE = '2.21'
 
 
 def clean_up(executable):
@@ -37,10 +38,18 @@ def tmp_folder():
     if sys.platform == 'win32':
         installation_file = os.path.join(TESTS_FOLDER, WIN_FILENAME)
         executable = os.path.join(TMP_PATH_FOLDER, 'chromedriver.exe')
+    elif sys.platform == 'linux':
+        installation_file = os.path.join(TESTS_FOLDER, linux.LINUX_FILENAME)
+        executable = os.path.join(TMP_PATH_FOLDER, 'chromedriver')
 
     with ZipFile(installation_file) as z:
         z.extractall(TMP_PATH_FOLDER)
         z.close()
+
+    if sys.platform == 'linux':
+        st = os.stat(executable)
+        os.chmod(executable, st.st_mode | stat.S_IEXEC)
+
 
     yield TMP_PATH_FOLDER
     clean_up(executable)
@@ -59,6 +68,18 @@ def test_win_get_local_release(tmp_folder):
 @pytest.mark.windows
 def test_win_get_path_ok(tmp_folder):
     assert win_get_path() in (tmp_folder, APPVEYOR_PATH)
+
+
+###############################################################################
+# LINUX ESPECIFIC FUNCTIONS
+###############################################################################
+
+
+@pytest.mark.linux
+def test_linux_get_local_release(tmp_folder):
+    release = linux.get_local_release(tmp_folder)
+    assert release == TEST_RELEASE
+
 
 
 ###############################################################################
@@ -87,7 +108,7 @@ def test_guard_installation_filename():
     elif sys.platform == 'linux':
         assert g.installation_file == LINUX_FILENAME
     else:
-        raise 'Platform not supported - {}'.format(sys.platform)
+        raise EnvironmentError('Platform not supported - {}'.format(sys.platform))
 
 
 @pytest.mark.Guard

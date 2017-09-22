@@ -6,21 +6,18 @@ from selenium.common.exceptions import WebDriverException
 
 from . utils import parse_chromedriver_version
 
+
 n_bits, linkage = platform.architecture()
-LINUX_FILENAME = 'chromedriver_linux{}.zip'.format(n_bits)
+LINUX_FILENAME = 'chromedriver_linux{}.zip'.format(n_bits[:2])
+CMD = 'chromedriver'
 
 
-def get_local_release(executable_path='chromedriver'):
-    cmd = [executable_path, '-v']
-    try:
-        process = Popen(cmd, env=os.environ,
-                        close_fds=platform.system() != 'Windows',
-                        stdout=PIPE, stderr=PIPE)
-    except OSError:
-        msg = '{} executable needs to be in PATH.'
-        raise WebDriverException(
-            msg.format(os.path.basename(executable_path)))
-    else:
-        stdout = process.communicate()[0]
-        version = parse_chromedriver_version(stdout.decode())
+def get_local_release(executable_path=''):
+    cmd = os.path.join(executable_path, CMD)
+    with Popen([cmd, '-v'], close_fds=True, stdout=PIPE,
+               universal_newlines=True) as process:
+        stdout = process.stdout.read()
+        stdout.kill()
+
+    version = parse_chromedriver_version(stdout.strip())
     return version

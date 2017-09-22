@@ -1,5 +1,5 @@
 init:
-	pip install -r requirements.txt -U
+	pip3.6 install -r requirements.txt -U
 
 test:
 	pytest tests/test.py --verbose --cov-report term --cov-report xml --cov chromeguard
