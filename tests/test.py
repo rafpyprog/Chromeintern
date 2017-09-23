@@ -7,6 +7,7 @@ from zipfile import ZipFile
 
 from chromeguard import Guard
 from chromeguard import linux
+from chromeguard.linux import LINUX_FILENAME
 from chromeguard.mac import MAC_FILENAME
 from chromeguard.win import WIN_FILENAME, get_local_release, win_get_path
 from chromeguard.exceptions import NotUpdatedException
@@ -50,7 +51,6 @@ def tmp_folder():
         st = os.stat(executable)
         os.chmod(executable, st.st_mode | stat.S_IEXEC)
 
-
     yield TMP_PATH_FOLDER
     clean_up(executable)
 
@@ -81,7 +81,6 @@ def test_linux_get_local_release(tmp_folder):
     assert release == TEST_RELEASE
 
 
-
 ###############################################################################
 # CHROMEGUARD - PLATFORM INDEPENDENT FUNCTIONS
 ###############################################################################
@@ -108,7 +107,8 @@ def test_guard_installation_filename():
     elif sys.platform == 'linux':
         assert g.installation_file == LINUX_FILENAME
     else:
-        raise EnvironmentError('Platform not supported - {}'.format(sys.platform))
+        msg = 'Platform not supported - {}'.format(sys.platform)
+        raise EnvironmentError(msg)
 
 
 @pytest.mark.Guard

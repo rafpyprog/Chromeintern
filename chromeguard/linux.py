@@ -2,8 +2,6 @@ import os
 import platform
 from subprocess import PIPE, Popen
 
-from selenium.common.exceptions import WebDriverException
-
 from . utils import parse_chromedriver_version
 
 
