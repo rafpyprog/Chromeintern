@@ -7,7 +7,7 @@ from zipfile import ZipFile
 
 from chromeguard import Guard
 from chromeguard import linux
-from chromeguard.linux import LINUX_FILENAME
+from chromeguard.linux import LINUX_FILENAME, linux_get_path
 from chromeguard.mac import MAC_FILENAME
 from chromeguard.win import WIN_FILENAME, get_local_release, win_get_path
 from chromeguard.exceptions import NotUpdatedException
@@ -32,7 +32,7 @@ def clean_up(executable):
             break
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def installation_file():
     if sys.platform == 'win32':
         installation_file = os.path.join(TESTS_FOLDER, WIN_FILENAME)
@@ -86,9 +86,9 @@ def test_win_get_path_ok(tmp_folder):
 ###############################################################################
 
 @pytest.mark.linux
-@pytest.fixture(scope=session)
+@pytest.fixture(scope='session')
 def tmp_local_driver(tmpdir_factory, installation_file):
-    tmp_path = tmpdir.strpath
+    tmp_path = tmpdir_factory.getbasetemp()
     unzip(installation_file, path=tmp_path)
 
     executable = {'win32': 'chromedriver.exe', 'linux': 'chromedriver'}
@@ -106,6 +106,7 @@ def test_linux_get_local_release(tmp_local_driver):
 
 @pytest.mark.linux
 def test_linux_get_path(tmp_local_driver):
+    assert os.path.dirname(linux_get_path()) == tmp_local_driver.strpath
     '''install chromedriver on tmp_dir and check if ok. Uninstall and
     then checj for raise'''
     pass

@@ -23,7 +23,7 @@ def get_local_release(executable_path=''):
     return version
 
 
-def get_path():
+def linux_get_path():
     cmd = ['which', CMD]
     driver_current_dir = os.path.join(os.getcwd(), CMD)
     driver_in_current_dir = os.path.isfile(driver_current_dir)
