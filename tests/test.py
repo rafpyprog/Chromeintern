@@ -33,6 +33,17 @@ def clean_up(executable):
 
 
 @pytest.fixture
+def installation_file():
+    if sys.platform == 'win32':
+        installation_file = os.path.join(TESTS_FOLDER, WIN_FILENAME)
+        #executable = os.path.join(TMP_PATH_FOLDER, 'chromedriver.exe')
+    elif sys.platform == 'linux':
+        installation_file = os.path.join(TESTS_FOLDER, linux.LINUX_FILENAME)
+        #executable = os.path.join(TMP_PATH_FOLDER, 'chromedriver')
+    return installation_file
+
+
+@pytest.fixture
 def tmp_folder():
     TMP_PATH_FOLDER = os.path.normpath(os.path.expanduser('~'))
 
@@ -74,12 +85,30 @@ def test_win_get_path_ok(tmp_folder):
 # LINUX ESPECIFIC FUNCTIONS
 ###############################################################################
 
+@pytest.mark.linux
+@pytest.fixture(scope=session)
+def tmp_local_driver(tmpdir_factory, installation_file):
+    tmp_path = tmpdir.strpath
+    unzip(installation_file, path=tmp_path)
+
+    executable = {'win32': 'chromedriver.exe', 'linux': 'chromedriver'}
+
+    chromedriver = os.path.join(tmp_path, executable[sys.platform])
+    st = os.stat(chromedriver)
+    os.chmod(chromedriver, st.st_mode | stat.S_IEXEC)
+    return tmp_path
+
 
 @pytest.mark.linux
-def test_linux_get_local_release(tmp_folder):
-    release = linux.get_local_release(tmp_folder)
+def test_linux_get_local_release(tmp_local_driver):
+    release = linux.get_local_release(tmp_local_driver)
     assert release == TEST_RELEASE
 
+@pytest.mark.linux
+def test_linux_get_path(tmp_local_driver):
+    '''install chromedriver on tmp_dir and check if ok. Uninstall and
+    then checj for raise'''
+    pass
 
 ###############################################################################
 # CHROMEGUARD - PLATFORM INDEPENDENT FUNCTIONS
