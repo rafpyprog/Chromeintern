@@ -86,6 +86,8 @@ class Guard():
             print('Found existing installation: Chromedriver v{}'
                   .format(self.local_release))
 
+            # if path is only chromedriver we get the specific location for
+            # update
             installation_file = self.download(path=self.path)
             unzip(installation_file, path=self.path)
 

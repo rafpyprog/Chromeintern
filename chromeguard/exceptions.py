@@ -11,6 +11,11 @@ class ChromeGuardException(Exception):
         return exception_msg
 
 
+class ChromedriverNotFoundException(ChromeGuardException):
+    def __init__(self):
+        msg = 'Chromedriver executable not found on path.'
+        self.msg = msg
+
 class NotUpdatedException(ChromeGuardException):
     '''
     Thrown when Chromedriver is not up-to-date.
