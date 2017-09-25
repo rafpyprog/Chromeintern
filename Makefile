@@ -4,6 +4,10 @@ init:
 test:
 	pytest tests/test.py --verbose --cov-report term --cov-report xml --cov chromeguard
 
+test-linux:
+		python3.6 -m pytest -v tests/test.py -m linux
+
+
 test-win:
 	python -m pytest -v tests/test.py -m windows
 
