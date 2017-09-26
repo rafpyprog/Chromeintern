@@ -3,6 +3,7 @@ __pycache__/
 build/
 chromeintern.egg-info/
 dist/
+tmp_dir/
 
 .coverage
 *.egg
