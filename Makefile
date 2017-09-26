@@ -5,8 +5,8 @@ test:
 	pytest tests/test.py --verbose --cov-report term --cov-report xml --cov chromeguard
 
 test-linux:
-	python3.6 -m pytest -v tests/test.py -m linux
-	python3.6 -m pytest -v tests/test.py -m Guard --cov-report term --cov-report xml --cov chromeguard
+	python3.6 -m pytest -v tests/test.py -m linux --basetemp=tests/tmp_dir
+	python3.6 -m pytest -v tests/test.py -m Guard --basetemp=tests/tmp_dir --cov-report term --cov-report xml --cov chromeguard
 
 
 test-win:
