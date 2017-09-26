@@ -34,6 +34,8 @@ def clean_up(executable):
 
 @pytest.fixture(scope='session')
 def installation_file():
+    ''' Return the name of the zip file with the chromedriver executable for
+    the platform '''
     if sys.platform == 'win32':
         installation_file = os.path.join(TESTS_FOLDER, WIN_FILENAME)
         #executable = os.path.join(TMP_PATH_FOLDER, 'chromedriver.exe')
@@ -43,27 +45,23 @@ def installation_file():
     return installation_file
 
 
-@pytest.fixture
-def tmp_folder():
-    TMP_PATH_FOLDER = os.path.normpath(os.path.expanduser('~'))
+###############################################################################
+#  TMP FOLDER FOR CHROMEDRIER EXECUTABLE. SHOULD BE ON PATH
+###############################################################################
+@pytest.fixture(scope='session')
+def tmp_local_driver(tmpdir_factory, installation_file):
+    tmp_path = tmpdir_factory.getbasetemp()
+    unzip(installation_file, path=tmp_path)
 
-    if sys.platform == 'win32':
-        installation_file = os.path.join(TESTS_FOLDER, WIN_FILENAME)
-        executable = os.path.join(TMP_PATH_FOLDER, 'chromedriver.exe')
-    elif sys.platform == 'linux':
-        installation_file = os.path.join(TESTS_FOLDER, linux.LINUX_FILENAME)
-        executable = os.path.join(TMP_PATH_FOLDER, 'chromedriver')
+    executable = {'win32': 'chromedriver.exe', 'linux': 'chromedriver'}
 
-    with ZipFile(installation_file) as z:
-        z.extractall(TMP_PATH_FOLDER)
-        z.close()
+    chromedriver_path = os.path.join(tmp_path, executable[sys.platform])
+    yield chromedriver_path
 
-    if sys.platform == 'linux':
-        st = os.stat(executable)
-        os.chmod(executable, st.st_mode | stat.S_IEXEC)
+    # Teardown
+    os.remove(chromedriver_path)
+    os.rmdir(tmp_path)
 
-    yield TMP_PATH_FOLDER
-    clean_up(executable)
 
 ###############################################################################
 # WINDOWS ESPECIFIC FUNCTIONS
@@ -86,17 +84,20 @@ def test_win_get_path_ok(tmp_folder):
 ###############################################################################
 
 @pytest.mark.linux
-@pytest.fixture(scope='session')
-def tmp_local_driver(tmpdir_factory, installation_file):
-    tmp_path = tmpdir_factory.getbasetemp()
-    unzip(installation_file, path=tmp_path)
+def test_chromedriver_tmp_path(tmp_local_driver):
+        assert tmp_local_driver == os.path.join(TESTS_FOLDER, 'tmp_dir',
+                                                'chromedriver')
 
-    executable = {'win32': 'chromedriver.exe', 'linux': 'chromedriver'}
 
-    chromedriver = os.path.join(tmp_path, executable[sys.platform])
-    st = os.stat(chromedriver)
-    os.chmod(chromedriver, st.st_mode | stat.S_IEXEC)
-    return tmp_path
+@pytest.mark.linux
+def test_chromedriver_is_executable_false(tmp_local_driver):
+        assert not linux.is_allowed_to_execute(tmp_local_driver)
+
+
+@pytest.mark.linux
+def test_allow_to_execute_ok(tmp_local_driver):
+    linux.allow_execution_as_program(tmp_local_driver)
+    assert linux.is_allowed_to_execute(tmp_local_driver) is True
 
 
 @pytest.mark.linux
@@ -104,9 +105,10 @@ def test_linux_get_local_release(tmp_local_driver):
     release = linux.get_local_release(tmp_local_driver)
     assert release == TEST_RELEASE
 
+
 @pytest.mark.linux
 def test_linux_get_path(tmp_local_driver):
-    assert os.path.dirname(linux_get_path()) == tmp_local_driver.strpath
+    assert linux_get_path() == tmp_local_driver
     '''install chromedriver on tmp_dir and check if ok. Uninstall and
     then checj for raise'''
     pass
@@ -115,18 +117,21 @@ def test_linux_get_path(tmp_local_driver):
 # CHROMEGUARD - PLATFORM INDEPENDENT FUNCTIONS
 ###############################################################################
 
+@pytest.mark.linux
 @pytest.mark.Guard
-def test_guard_get_local_release(tmp_folder):
-    g = Guard(path=tmp_folder)
+def test_guard_get_local_release(tmp_local_driver):
+    g = Guard()
     assert g.local_release == TEST_RELEASE
 
 
+@pytest.mark.linux
 @pytest.mark.Guard
 def test_guard_latest_release():
     g = Guard()
     assert g.latest_release == API_get_latest_release()
 
 
+@pytest.mark.linux
 @pytest.mark.Guard
 def test_guard_installation_filename():
     g = Guard()
@@ -141,21 +146,25 @@ def test_guard_installation_filename():
         raise EnvironmentError(msg)
 
 
+@pytest.mark.linux
 @pytest.mark.Guard
-def test_guard_is_updated_false(tmp_folder):
+def test_guard_is_updated_false():
     ''' The test installation refers to release 2.20. Should return False '''
-    g = Guard(path=tmp_folder)
+    g = Guard()
     assert g.is_updated is False
 
 
+@pytest.mark.linux
 @pytest.mark.Guard
-def test_guard_is_updated_true(tmp_folder):
+def test_guard_is_updated_true(tmp_local_driver):
     '''  Download the latest release, insert on path. Should return True '''
-
-    g = Guard(path=tmp_folder)
+    tmp_folder = os.path.dirname(tmp_local_driver)
+    g = Guard()
     # download the latest release to the tmp path folder and unzi
-    g.download()
-    unzip(os.path.join(tmp_folder, g.installation_file), tmp_folder)
+    g.download(path=tmp_folder)
+    zip_file = os.path.join(tmp_folder, g.installation_file)
+    unzip(zip_file, tmp_folder)
+    os.remove(zip_file)
     assert g.is_updated is True
 
 
