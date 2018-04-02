@@ -19,12 +19,12 @@ class ChromeDriver():
             cmd_stdout (string): Output from chromedriver -v
         '''
         CHROMEDRIVER_VERSION_PATTERN = '\d+\.\d+'
-        version = re.search(CHROMEDRIVER_VERSION_PATTERN, cmd_stdout)
+        version = re.search(CHROMEDRIVER_VERSION_PATTERN, stdout)
         if version:
             return version.group()
         else:
             raise Exception('Unable to parse Chromedriver version {}'
-                            .format(cmd_stdout))
+                            .format(stdout))
 
     @property
     def version(self):
