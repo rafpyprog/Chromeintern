@@ -1,0 +1,4 @@
+[run]
+omit = *eggs*       
+       setup.py
+       tests/*
