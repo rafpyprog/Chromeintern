@@ -1,3 +1,5 @@
+import re
+
 import pytest
 import requests
 
@@ -23,3 +25,13 @@ def test_latest_chromedriver():
     latest_release = requests.get(LATEST_URL).text.strip()
     driver = ChromeDriver()
     assert driver.latest_release == latest_release
+
+
+def test_get_release_notes():
+    driver = ChromeDriver()
+    latest = driver.latest_release
+    notes = driver.get_release_notes()
+    assert isinstance(notes, str)
+    PATTERN = 'ChromeDriver v' + latest + ' \([0-9]{4}-[0-9]{2}-[0-9]{2}\)'
+    notes_validation = re.search(PATTERN, notes)
+    assert notes_validation is not None
