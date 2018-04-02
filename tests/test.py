@@ -161,28 +161,22 @@ def test_guard_is_updated_true(tmp_local_driver):
     tmp_folder = os.path.dirname(tmp_local_driver)
     g = Guard()
     # download the latest release to the tmp path folder and unzi
-    g.download(path=tmp_folder)
-    zip_file = os.path.join(tmp_folder, g.installation_file)
-    unzip(zip_file, tmp_folder)
+    g.download(path=tmp_local_driver)
+    zip_file = os.path.join(tmp_local_driver, g.installation_file)
+    unzip(zip_file, tmp_local_driver)
     os.remove(zip_file)
     assert g.is_updated is True
 
-
+@pytest.mark.linux
 @pytest.mark.Guard
-def test_guard_download_latest_release(tmp_folder):
-    g = Guard(path=tmp_folder)
-    g.download()
-    assert os.path.isfile(os.path.join(tmp_folder, g.installation_file))
-
-
-@pytest.mark.Guard
-def test_guard_update_already_updated(tmp_folder):
-    g = Guard(path=tmp_folder)
-    # download the latest release to the tmp path folder and unzi
-    g.download()
-    unzip(os.path.join(tmp_folder, g.installation_file), tmp_folder)
-    # already updated retunr None
+def test_guard_update_already_updated(tmp_local_driver):
+    # Once the the latest update was installed in the last test check if the update
+    # funtion will return none
+    g = Guard()
     assert g.update() is None
+    #g.download()
+    #unzip(os.path.join(tmp_folder, g.installation_file), tmp_folder)
+    # already updated retunr None
 
 
 @pytest.mark.Guard
