@@ -94,7 +94,7 @@ class ChromeDriver():
 
     def download(self, driver_version, os):
         os_param = {'linux': 'linux64', 'windows': 'win32', 'mac': 'mac64'}
-        URL = GOOGLE_API + '{}/chromedriver_{}.zip'.format(driver_version,
+        URL = self.GOOGLE_API + '{}/chromedriver_{}.zip'.format(driver_version,
                                                            os_param[os])
         response = requests.get(URL)
         response.raise_for_status()
@@ -102,7 +102,7 @@ class ChromeDriver():
         return installation_file
 
     def install(self, installation_file, path=None):
-        assert zipfile.is_zipfile(installation_file) is True
+        assert is_zipfile(installation_file) is True
         zip_file = ZipFile(installation_file)
         driver_binary = zip_file.namelist()[0]
         if path is None:

@@ -1,4 +1,7 @@
 import re
+import os
+import platform
+from zipfile import is_zipfile
 
 import pytest
 import requests
@@ -35,3 +38,18 @@ def test_get_release_notes():
     PATTERN = 'ChromeDriver v' + latest + ' \([0-9]{4}-[0-9]{2}-[0-9]{2}\)'
     notes_validation = re.search(PATTERN, notes)
     assert notes_validation is not None
+
+
+def test_download_chromedriver():
+    driver = ChromeDriver()
+    installation_file = driver.download(driver.latest_release, os='linux')
+    assert is_zipfile(installation_file) is True
+
+
+def test_install_chromedriver():
+    driver = ChromeDriver()
+    os_name = platform.system().lower()
+    installation_file = driver.download(driver.latest_release, os=os_name)
+    path = driver.install(installation_file, path='.')
+    assert path == 'chromedriver'
+    os.remove('chromedriver')
