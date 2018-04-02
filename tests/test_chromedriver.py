@@ -1,4 +1,5 @@
 import pytest
+import requests
 
 from chromeguard import ChromeDriver
 
@@ -15,3 +16,10 @@ def test_parse_chromedriver_version():
     parsed_version = driver.parse_chromedriver_version(VERSION)
     EXPECTED_VERSION = '2.37'
     assert parsed_version == EXPECTED_VERSION
+
+
+def test_latest_chromedriver():
+    LATEST_URL = 'https://chromedriver.storage.googleapis.com/LATEST_RELEASE'
+    latest_release = requests.get(LATEST_URL).text.strip()
+    driver = ChromeDriver()
+    assert driver.latest_release == latest_release
