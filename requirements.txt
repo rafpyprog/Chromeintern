@@ -2,6 +2,7 @@ beautifulsoup4>=4.5.3
 fire
 codecov
 lxml
+pandas
 pytest
 requests
 selenium

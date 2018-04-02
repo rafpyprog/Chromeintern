@@ -38,14 +38,14 @@ class ChromeDriver():
 
     @property
     def latest_release(self):
-        URL = GOOGLE_API + 'LATEST_RELEASE'
+        URL = self.GOOGLE_API + 'LATEST_RELEASE'
         response = requests.get(URL)
         response.raise_for_status()
         release = response.text.strip()
         return release
 
     def get_release_notes(self):
-        release_notes_url = ''.join([GOOGLE_API, self.latest_release,
+        release_notes_url = ''.join([self.GOOGLE_API, self.latest_release,
                                     '/notes.txt'])
         response = requests.get(release_notes_url)
         return response.text
@@ -106,5 +106,5 @@ class ChromeDriver():
         zip_file = ZipFile(installation_file)
         driver_binary = zip_file.namelist()[0]
         if path is None:
-            path = os.path.dirname(shutil.which('chromedriver'))            
+            path = os.path.dirname(shutil.which('chromedriver'))
         return zip_file.extract(driver_binary, path=path)
